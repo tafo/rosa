@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/spf13/viper"
-	"github.com/tafo/rosa/config"
+	"github.com/tafo/rosa/internal"
 	"net/http"
 	"os"
 	"os/signal"
@@ -24,7 +24,7 @@ func gracefullyShutdown(srv *http.Server) int {
 	errCh := make(chan error)
 	defer close(errCh)
 
-	config.Logger.Info().Msg(fmt.Sprintf("Received signal: %s, shutting down", in.String()))
+	internal.Logger.Info().Msg(fmt.Sprintf("Received signal: %s, shutting down", in.String()))
 
 	go func(s *http.Server, errCh chan error) {
 		timeoutDuration := time.Duration(viper.GetInt("graceful_shutdown_timeout_in_seconds")) * time.Second
@@ -48,13 +48,13 @@ func gracefullyShutdown(srv *http.Server) int {
 		// EX_SOFTWARE. See "sysexits.h"
 		exit = 70
 
-		config.Logger.Error().Err(e).Msg("Failed to shutdown server gracefully")
+		internal.Logger.Error().Err(e).Msg("Failed to shutdown server gracefully")
 	} else {
-		config.Logger.Info().Msg("Successfully closed server")
+		internal.Logger.Info().Msg("Successfully closed server")
 	}
 
 	// Terminate server
-	config.Logger.Info().Msg("Shutdown complete")
+	internal.Logger.Info().Msg("Shutdown complete")
 
 	return exit
 }

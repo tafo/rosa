@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"github.com/spf13/viper"
 	"github.com/tafo/rosa/config"
-	"net/http"
+	"github.com/tafo/rosa/internal"
 	"os"
 )
 
 func init() {
 	config.InitConfiguration()
-	config.InitLogger()
-	InitContainer()
+	internal.InitLogger()
 }
 
 func main() {
@@ -25,15 +24,14 @@ func main() {
 	os.Exit(exit)
 }
 func run() (int, error) {
-	config.Logger.Info().Msg(fmt.Sprintf("Starting rosa (v%s) on :%d", viper.GetString("version"), viper.GetInt("server_port")))
+	internal.Logger.Info().Msg(fmt.Sprintf("Starting rosa (v%s) on :%d", viper.GetString("version"), viper.GetInt("server_port")))
 
-	server := &http.Server{
-		Addr: fmt.Sprintf(":%d", viper.GetInt("server_port")),
-	}
+	server := CreateWebServer()
 
+	internal.Logger.Info().Msg(fmt.Sprintf("Hede %s", server.Addr))
 	err := server.ListenAndServe()
 	if err != nil {
-		config.Logger.Fatal().Err(err).Msg("Could not start the service")
+		internal.Logger.Fatal().Err(err).Msg("Could not start the service")
 	}
 
 	exitCode := gracefullyShutdown(server)

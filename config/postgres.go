@@ -1,32 +1,18 @@
 package config
 
 import (
-	"database/sql"
 	"github.com/spf13/viper"
+	"github.com/tafo/rosa/internal"
+	"github.com/tafo/rosa/internal/auth/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func NewConnection() *gorm.DB {
-	db, err := sql.Open("postgres", viper.GetString("DATABASE_URL"))
+	conn, err := gorm.Open(postgres.Open(viper.GetString("DB_DSN")), &gorm.Config{})
+	_ = conn.AutoMigrate(&models.Account{})
 	if err != nil {
-		Logger.Fatal().Err(err).Msg("Db connection failed")
-		return nil
-	}
-
-	dialector := postgres.New(postgres.Config{
-		Conn: db,
-	})
-
-	conn, err := gorm.Open(dialector, &gorm.Config{})
-
-	if err != nil {
-		Logger.Fatal().Err(err).Msg("Db connection failed")
-		return nil
-	}
-
-	if err = db.Ping(); err != nil {
-		Logger.Fatal().Err(err).Msg("Ping failed")
+		internal.Logger.Fatal().Err(err).Msg("Db connection failed")
 		return nil
 	}
 
