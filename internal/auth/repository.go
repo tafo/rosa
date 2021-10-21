@@ -2,19 +2,20 @@ package auth
 
 import (
 	"github.com/tafo/rosa/internal"
-	"github.com/tafo/rosa/internal/auth/models"
 	"gorm.io/gorm"
 )
 
-type AccountRepository struct {
+type Repository struct {
 	db *gorm.DB
 }
 
-func NewAccountRepository(db *gorm.DB) AccountRepository {
-	return AccountRepository{db: db}
+var Repo Repository
+
+func InitRepository(db *gorm.DB) {
+	Repo.db = db
 }
 
-func (repo AccountRepository) Insert(account *models.Account) error {
+func (repo Repository) Insert(account *Account) error {
 	result := repo.db.Create(account)
 	if err := result.Error; err != nil {
 		internal.Logger.Error().Err(err).Msg("Account could be created")

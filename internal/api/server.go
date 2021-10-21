@@ -3,26 +3,20 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/swaggo/gin-swagger/swaggerFiles"
 	"github.com/tafo/rosa/internal/auth"
-	"github.com/tafo/rosa/internal/auth/middlewares"
+	"github.com/tafo/rosa/internal/middlewares"
 	"net/http"
 	"time"
 )
 
-func NewHttpServer(router *gin.Engine, accountHandler auth.AccountHandler, authMiddleware middlewares.AuthMiddleware) *http.Server {
-	router.Use(gin.Recovery())
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+func NewHttpServer() *http.Server {
+	var router = NewRouter()
+	// router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	accountHandler.Routes(router)
+	auth.Handler.MapRoutes(router)
 	{
 		authorized := router.Group("/")
-		authorized.Use(authMiddleware.Handler())
-	}
-	{
-		//admin := router.Group("/")
-		//admin.Use(authMiddleware.Handler(), adminMiddleware.Handler())
+		authorized.Use(middlewares.AuthHandler())
 	}
 
 	port := viper.GetString("server_port")
@@ -39,6 +33,14 @@ func NewHttpServer(router *gin.Engine, accountHandler auth.AccountHandler, authM
 }
 
 func NewRouter() *gin.Engine {
-	gin.SetMode(gin.ReleaseMode)
-	return gin.New()
+	switch viper.GetString("server_mode") {
+	case gin.ReleaseMode:
+		gin.SetMode(gin.ReleaseMode)
+	case gin.TestMode:
+		gin.SetMode(gin.TestMode)
+	default:
+		gin.SetMode(gin.DebugMode)
+	}
+
+	return gin.Default()
 }

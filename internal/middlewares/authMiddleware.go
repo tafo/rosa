@@ -1,22 +1,17 @@
 package middlewares
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/tafo/rosa/internal/auth/models"
+	"github.com/golang-jwt/jwt"
+	"github.com/spf13/viper"
+	"github.com/tafo/rosa/internal/auth"
 	"net/http"
 	"regexp"
 )
 
 
-type AuthMiddleware struct {
-	jwt models.JWTWrapper
-}
-
-func NewAuthMiddleware(jwt models.JWTWrapper) AuthMiddleware {
-	return AuthMiddleware{jwt}
-}
-
-func (m AuthMiddleware) Handler() gin.HandlerFunc {
+func AuthHandler() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		header := context.GetHeader("Authorization")
 		if header == "" {
@@ -35,8 +30,26 @@ func (m AuthMiddleware) Handler() gin.HandlerFunc {
 			return
 		}
 
-		token := header[7:]
-		account, err := m.jwt.ExtractUserFromToken(token)
+		tokenString := header[7:]
+
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("invalid signing method: %v", token.Header["alg"])
+			}
+
+			return []byte(viper.GetString("jwt_secret")), nil
+		})
+
+		if err != nil {
+			return
+		}
+
+		var account auth.Account
+		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+			account.Id = claims["id"].(int)
+			account.Email = claims["email"].(string)
+		}
+
 		if err != nil {
 			context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"message": "You are not authorized.",

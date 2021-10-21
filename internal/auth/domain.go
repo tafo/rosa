@@ -1,4 +1,4 @@
-package models
+package auth
 
 type Account struct {
 	Id    int    `gorm:"id, primarykey, autoincrement" json:"id"`

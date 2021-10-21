@@ -5,11 +5,13 @@ import (
 	"github.com/spf13/viper"
 	"github.com/tafo/rosa/config"
 	"github.com/tafo/rosa/internal"
+	"github.com/tafo/rosa/internal/api"
+	"github.com/tafo/rosa/internal/auth"
 	"os"
 )
 
 func init() {
-	config.InitConfiguration()
+	InitConfiguration()
 	internal.InitLogger()
 }
 
@@ -25,8 +27,9 @@ func main() {
 }
 func run() (int, error) {
 	internal.Logger.Info().Msg(fmt.Sprintf("Starting rosa (v%s) on :%d", viper.GetString("version"), viper.GetInt("server_port")))
-
-	server := CreateWebServer()
+	var gormDb = config.NewConnection()
+	auth.InitRepository(gormDb)
+	server := api.NewHttpServer()
 
 	internal.Logger.Info().Msg(fmt.Sprintf("Hede %s", server.Addr))
 	err := server.ListenAndServe()

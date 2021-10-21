@@ -6,6 +6,6 @@ type RegisterRequest struct {
 	PasswordConfirmation string `json:"passwordConfirmation" binding:"required,eqfield=Password"`
 }
 
-type AuthResponse struct {
+type RegisterResponse struct {
 	Token string
 }

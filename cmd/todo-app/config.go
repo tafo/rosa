@@ -1,4 +1,4 @@
-package config
+package main
 
 import (
 	"fmt"
@@ -14,6 +14,6 @@ func InitConfiguration() {
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		panic(fmt.Errorf("fatal error %w", err))
+		panic(fmt.Errorf("could not load config %w", err))
 	}
 }
