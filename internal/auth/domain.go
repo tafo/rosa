@@ -1,8 +1,8 @@
 package auth
 
 type Account struct {
-	Id    int    `gorm:"id, primarykey, autoincrement" json:"id"`
-	Email string `gorm:"email; unique" json:"email"`
-	Password  string `gorm:"password" json:"password"`
-	CreatedAt int64  `gorm:"created_at"`
+	Id        float64 `gorm:"id, primarykey, autoincrement"`
+	Email     string  `gorm:"email; unique"`
+	Password  string  `gorm:"password"`
+	CreatedAt int64   `gorm:"created_at"`
 }

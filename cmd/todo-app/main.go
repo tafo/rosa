@@ -7,6 +7,7 @@ import (
 	"github.com/tafo/rosa/internal"
 	"github.com/tafo/rosa/internal/api"
 	"github.com/tafo/rosa/internal/auth"
+	"github.com/tafo/rosa/internal/todo"
 	"os"
 )
 
@@ -27,11 +28,12 @@ func main() {
 }
 func run() (int, error) {
 	internal.Logger.Info().Msg(fmt.Sprintf("Starting rosa (v%s) on :%d", viper.GetString("version"), viper.GetInt("server_port")))
-	var gormDb = config.NewConnection()
-	auth.InitRepository(gormDb)
-	server := api.NewHttpServer()
 
-	internal.Logger.Info().Msg(fmt.Sprintf("Hede %s", server.Addr))
+	var gormDb = config.NewConnection()
+	auth.InitAccountRepository(gormDb)
+	todo.InitItemRepository(gormDb)
+
+	server := api.NewHttpServer()
 	err := server.ListenAndServe()
 	if err != nil {
 		internal.Logger.Fatal().Err(err).Msg("Could not start the service")

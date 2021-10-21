@@ -5,17 +5,17 @@ import (
 	"gorm.io/gorm"
 )
 
-type Repository struct {
+type AccountRepository struct {
 	db *gorm.DB
 }
 
-var Repo Repository
+var Repo AccountRepository
 
-func InitRepository(db *gorm.DB) {
+func InitAccountRepository(db *gorm.DB) {
 	Repo.db = db
 }
 
-func (repo Repository) Insert(account *Account) error {
+func (repo AccountRepository) Insert(account *Account) error {
 	result := repo.db.Create(account)
 	if err := result.Error; err != nil {
 		internal.Logger.Error().Err(err).Msg("Account could be created")

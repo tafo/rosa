@@ -5,19 +5,20 @@ import (
 	"github.com/spf13/viper"
 	"github.com/tafo/rosa/internal/auth"
 	"github.com/tafo/rosa/internal/middlewares"
+	"github.com/tafo/rosa/internal/todo"
 	"net/http"
 	"time"
 )
 
 func NewHttpServer() *http.Server {
 	var router = NewRouter()
-	// router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	auth.Handler.MapRoutes(router)
-	{
-		authorized := router.Group("/")
-		authorized.Use(middlewares.AuthHandler())
-	}
+	authorized := router.Group("/")
+	auth.Handler.MapRoutes(authorized)
+
+	private := router.Group("/items")
+	private.Use(middlewares.AuthHandler())
+	todo.Handler.MapRoutes(private)
 
 	port := viper.GetString("server_port")
 	if port == "" {

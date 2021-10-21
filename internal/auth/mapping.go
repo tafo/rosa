@@ -11,3 +11,10 @@ func (r RegisterRequest) ToEntity() Account {
 		CreatedAt: time.Now().Unix(),
 	}
 }
+
+func (request LoginRequest) ToEntity() Account {
+	return Account{
+		Email: request.Email,
+		Password: request.Password,
+	}
+}

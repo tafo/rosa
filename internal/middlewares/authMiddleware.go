@@ -46,7 +46,7 @@ func AuthHandler() gin.HandlerFunc {
 
 		var account auth.Account
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			account.Id = claims["id"].(int)
+			account.Id = claims["id"].(float64)
 			account.Email = claims["email"].(string)
 		}
 
