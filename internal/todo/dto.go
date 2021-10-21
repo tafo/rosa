@@ -7,3 +7,7 @@ type AddRequest struct {
 type AddResponse struct {
 	Item
 }
+
+type CompleteRequest struct {
+	Id int
+}

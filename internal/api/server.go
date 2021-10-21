@@ -13,8 +13,8 @@ import (
 func NewHttpServer() *http.Server {
 	var router = NewRouter()
 
-	authorized := router.Group("/")
-	auth.Handler.MapRoutes(authorized)
+	public := router.Group("/")
+	auth.Handler.MapRoutes(public)
 
 	private := router.Group("/items")
 	private.Use(middlewares.AuthHandler())
